@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CryptographyTube Community Forum</title>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Forum Styles -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="forum-body">
+
+    <!-- ==================== AUTH SECTION (Login/Register) ==================== -->
+    <div id="authSection" class="auth-container">
+        <div class="auth-wrapper">
+            <!-- Logo -->
+            <div class="auth-logo">
+                <div class="auth-logo-icon">₿</div>
+                <h1>CRYPTOGRAPHY<span class="accent">TUBE</span></h1>
+                <p class="auth-subtitle">Community Forum</p>
+                <p class="auth-platform"><i class="fas fa-cloud"></i> 100% Client-Side • Data Saved in Browser</p>
+            </div>
+
+            <!-- Login Form -->
+            <div id="loginForm" class="auth-form active">
+                <h2><i class="fas fa-sign-in-alt"></i> Welcome Back!</h2>
+                <p class="auth-desc">Login to join the crypto community discussion</p>
+                
+                <form onsubmit="emailLogin(event)">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="loginUsername" placeholder="Username" required minlength="3">
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="loginPassword" placeholder="Password" required minlength="4">
+                        <button type="button" class="toggle-pwd" onclick="togglePassword('loginPassword', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <button type="submit" class="btn-primary btn-full">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </button>
+                </form>
+
+                <p class="switch-auth">
+                    Don't have an account? 
+                    <a href="#" onclick="showRegister()">Register Now</a>
+                </p>
+                
+                <div class="demo-login-hint">
+                    <p><i class="fas fa-info-circle"></i> Demo Mode: Any username/password works!</p>
+                </div>
+            </div>
+
+            <!-- Register Form -->
+            <div id="registerForm" class="auth-form">
+                <h2><i class="fas fa-user-plus"></i> Join Community!</h2>
+                <p class="auth-desc">Create your account and start discussing</p>
+                
+                <form onsubmit="emailRegister(event)">
+                    <div class="input-group">
+                        <i class="fas fa-user"></i>
+                        <input type="text" id="regUsername" placeholder="Username (Public Name)" required minlength="3">
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-envelope"></i>
+                        <input type="email" id="regEmail" placeholder="Email (Optional)" type="text">
+                    </div>
+                    <div class="input-group">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" id="regPassword" placeholder="Password (min 4 chars)" required minlength="4">
+                        <button type="button" class="toggle-pwd" onclick="togglePassword('regPassword', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="agreeTerms" required>
+                        <span>I agree to the <a href="#">Community Guidelines</a></span>
+                    </label>
+
+                    <button type="submit" class="btn-primary btn-full">
+                        <i class="fas fa-user-plus"></i> Create Account
+                    </button>
+                </form>
+
+                <p class="switch-auth">
+                    Already have an account? 
+                    <a href="#" onclick="showLogin()">Login Here</a>
+                </p>
+            </div>
+
+            <!-- Loading Overlay -->
+            <div id="authLoading" class="loading-overlay hidden">
+                <div class="spinner"></div>
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== FORUM MAIN SECTION ==================== -->
+    <div id="forumSection" class="forum-container hidden">
+        
+        <!-- Forum Header -->
+        <header class="forum-header">
+            <div class="forum-header-left">
+                <div class="forum-logo-icon">₿</div>
+                <div class="forum-brand">
+                    <h2>CRYPTOGRAPHY<span class="accent">TUBE</span> COMMUNITY</h2>
+                    <span class="online-count"><i class="fas fa-circle text-success"></i> <span id="onlineUsers">--</span> Online</span>
+                </div>
+            </div>
+            
+            <div class="forum-header-center">
+                <div class="forum-search">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="forumSearchInput" placeholder="Search posts, topics..." oninput="searchForum(this.value)">
+                </div>
+            </div>
+
+            <div class="forum-header-right">
+                <button onclick="openCreatePostModal()" class="btn-create-post">
+                    <i class="fas fa-plus"></i> New Post
+                </button>
+                <div class="user-menu" onclick="toggleUserMenu()">
+                    <div class="user-avatar-small" id="userAvatarSmall">U</div>
+                    <span id="userNameSmall">User</span>
+                    <i class="fas fa-chevron-down"></i>
+                    <div id="userDropdown" class="user-dropdown hidden">
+                        <a href="#" onclick="viewProfile()"><i class="fas fa-user"></i> My Profile</a>
+                        <a href="#" onclick="exportData()"><i class="fas fa-download"></i> Export Data</a>
+                        <a href="#" onclick="importData()"><i class="fas fa-upload"></i> Import Data</a>
+                        <hr>
+                        <a href="#" onclick="logout()" class="text-danger"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Forum Navigation Tabs -->
+        <nav class="forum-nav">
+            <button class="nav-tab active" data-tab="all" onclick="filterByTab('all')">
+                <i class="fas fa-globe"></i> All Posts
+            </button>
+            <button class="nav-tab" data-tab="trending" onclick="filterByTab('trending')">
+                <i class="fas fa-fire"></i> Trending
+            </button>
+            <button class="nav-tab" data-tab="questions" onclick="filterByTab('questions')">
+                <i class="fas fa-question-circle"></i> Questions
+            </button>
+            <button class="nav-tab" data-tab="tutorials" onclick="filterByTab('tutorials')">
+                <i class="fas fa-book"></i> Tutorials
+            </button>
+            <button class="nav-tab" data-tab="tools" onclick="filterByTab('tools')">
+                <i class="fas fa-wrench"></i> Tools Discussion
+            </button>
+            <button class="nav-tab" data-tab="general" onclick="filterByTab('general')">
+                <i class="fas fa-comments"></i> General Chat
+            </button>
+        </nav>
+
+        <!-- Main Content Area -->
+        <main class="forum-main">
+            
+            <!-- Left Sidebar - Categories -->
+            <aside class="forum-sidebar">
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-layer-group"></i> Categories</h3>
+                    <ul class="category-list">
+                        <li onclick="filterCategory('all')" class="active" data-cat="all">
+                            <i class="fas fa-inbox"></i> All Categories
+                            <span class="count" id="catAllCount">0</span>
+                        </li>
+                        <li onclick="filterCategory('bitcoin')" data-cat="bitcoin">
+                            <i class="fab fa-bitcoin text-orange"></i> Bitcoin
+                            <span class="count" id="catBitcoinCount">0</span>
+                        </li>
+                        <li onclick="filterCategory('ethereum')" data-cat="ethereum">
+                            <i class="fab fa-ethereum text-blue"></i> Ethereum
+                            <span class="count" id="catEthereumCount">0</span>
+                        </li>
+                        <li onclick="filterCategory('security')" data-cat="security">
+                            <i class="fas fa-shield-alt text-green"></i> Security
+                            <span class="count" id="catSecurityCount">0</span>
+                        </li>
+                        <li onclick="filterCategory('wallets')" data-cat="wallets">
+                            <i class="fas fa-wallet text-purple"></i> Wallets
+                            <span class="count" id="catWalletsCount">0</span>
+                        </li>
+                        <li onclick="filterCategory('development')" data-cat="development">
+                            <i class="fas fa-code text-cyan"></i> Development
+                            <span class="count" id="catDevCount">0</span>
+                        </li>
+                        <li onclick="filterCategory('news')" data-cat="news">
+                            <i class="fas fa-newspaper text-red"></i> News & Updates
+                            <span class="count" id="catNewsCount">0</span>
+                        </li>
+                        <li onclick="filterCategory('offtopic')" data-cat="offtopic">
+                            <i class="fas fa-coffee text-brown"></i> Off Topic
+                            <span class="count" id="catOffTopicCount">0</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-trophy"></i> Top Contributors</h3>
+                    <ul class="top-users-list" id="topUsersList">
+                        <!-- Dynamically populated -->
+                    </ul>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-database"></i> Storage Info</h3>
+                    <div class="storage-info">
+                        <div class="storage-bar">
+                            <div class="storage-fill" id="storageFill" style="width: 0%"></div>
+                        </div>
+                        <p class="storage-text"><span id="storageUsed">0 KB</span> / 5 MB used</p>
+                        <button onclick="clearAllData()" class="btn-danger-sm">
+                            <i class="fas fa-trash"></i> Clear All Data
+                        </button>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Posts Feed -->
+            <section class="posts-feed">
+                <div class="feed-header">
+                    <h3 id="feedTitle"><i class="fas fa-stream"></i> Latest Posts</h3>
+                    <select id="sortSelect" onchange="sortPosts(this.value)">
+                        <option value="newest">Newest First</option>
+                        <option value="oldest">Oldest First</option>
+                        <option value="mostLiked">Most Liked</option>
+                        <option value="mostReplied">Most Discussed</option>
+                    </select>
+                </div>
+
+                <div id="postsContainer" class="posts-container">
+                    <div class="loading-posts">
+                        <div class="spinner"></div>
+                        <p>Loading posts...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Right Sidebar - Chat & Info -->
+            <aside class="forum-right-sidebar">
+                <!-- Quick Stats -->
+                <div class="sidebar-card stats-card">
+                    <h4><i class="fas fa-chart-bar"></i> Community Stats</h4>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-value" id="totalMembers">0</span>
+                            <span class="stat-label">Members</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="totalPosts">0</span>
+                            <span class="stat-label">Posts</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="totalReplies">0</span>
+                            <span class="stat-label">Replies</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-value" id="totalTopics">0</span>
+                            <span class="stat-label">Topics</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Chat Widget -->
+                <div class="sidebar-card chat-card">
+                    <h4><i class="fas fa-comments"></i> Live Chat <span class="chat-badge" id="unreadChatCount">0</span></h4>
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="chat-welcome">
+                            <i class="fas fa-rocketchat"></i>
+                            <p>Welcome to Community Chat!</p>
+                            <small>Data stored in your browser</small>
+                        </div>
+                    </div>
+                    <form onsubmit="sendChatMessage(event)" class="chat-input-form">
+                        <input type="text" id="chatInput" placeholder="Type a message..." autocomplete="off">
+                        <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                    </form>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="sidebar-card activity-card">
+                    <h4><i class="fas fa-clock"></i> Recent Activity</h4>
+                    <ul class="activity-list" id="activityList">
+                        <!-- Dynamically populated -->
+                    </ul>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- ==================== CREATE POST MODAL ==================== -->
+    <div id="createPostModal" class="modal-overlay hidden">
+        <div class="modal-content create-post-modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-edit"></i> Create New Post</h3>
+                <button onclick="closeCreatePostModal()" class="modal-close">&times;</button>
+            </div>
+            <form onsubmit="createPost(event)">
+                <div class="form-group">
+                    <label>Post Title *</label>
+                    <input type="text" id="postTitle" placeholder="Enter a descriptive title..." required maxlength="200">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Category *</label>
+                        <select id="postCategory" required>
+                            <option value="">Select Category</option>
+                            <option value="bitcoin">Bitcoin</option>
+                            <option value="ethereum">Ethereum</option>
+                            <option value="security">Security</option>
+                            <option value="wallets">Wallets</option>
+                            <option value="development">Development</option>
+                            <option value="news">News & Updates</option>
+                            <option value="offtopic">Off Topic</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Type</label>
+                        <select id="postType">
+                            <option value="discussion">Discussion</option>
+                            <option value="question">Question</option>
+                            <option value="tutorial">Tutorial</option>
+                            <option value="showcase">Showcase</option>
+                            <option value="announcement">Announcement</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Content *</label>
+                    <textarea id="postContent" placeholder="Write your post content here..." rows="10" required></textarea>
+                    <span class="char-count"><span id="charCount">0</span>/5000</span>
+                </div>
+                <div class="form-group">
+                    <label>Tags (comma separated)</label>
+                    <input type="text" id="postTags" placeholder="e.g., bitcoin, security, wallet">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" onclick="closeCreatePostModal()" class="btn-secondary">Cancel</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="fas fa-paper-plane"></i> Publish Post
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ==================== VIEW POST MODAL ==================== -->
+    <div id="viewPostModal" class="modal-overlay hidden">
+        <div class="modal-content view-post-modal">
+            <div class="modal-header">
+                <button onclick="closeViewPostModal()" class="modal-close">&times;</button>
+            </div>
+            <div id="viewPostContent" class="view-post-content">
+                <!-- Post content loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== PROFILE MODAL ==================== -->
+    <div id="profileModal" class="modal-overlay hidden">
+        <div class="modal-content profile-modal">
+            <div class="profile-header-bg">
+                <button onclick="closeProfileModal()" class="modal-close">&times;</button>
+                <div class="profile-avatar-large" id="profileAvatarLarge">U</div>
+                <h2 id="profileName">User</h2>
+                <p id="profileBio">Crypto enthusiast</p>
+                <div class="profile-stats">
+                    <div class="p-stat"><span id="profilePosts">0</span> Posts</div>
+                    <div class="p-stat"><span id="profileLikes">0</span> Likes</div>
+                    <div class="p-stat"><span id="profileJoined">-</span> Joined</div>
+                </div>
+            </div>
+            <div class="profile-body">
+                <h4>Your Posts</h4>
+                <div id="profilePostsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Hidden file input for import -->
+    <input type="file" id="importFileInput" accept=".json" style="display:none" onchange="handleImportFile(event)">
+
+    <!-- ==================== NOTIFICATIONS TOAST ==================== -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <!-- Forum Scripts -->
+    <script src="js/forum-app.js"></script>
+</body>
+</html>
